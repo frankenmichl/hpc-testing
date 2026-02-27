@@ -98,7 +98,7 @@ get_common_package_list()
 	    PACKAGE_LIST+=" targetcli-fb "
 	    PACKAGE_LIST+=" openmpi4 openmpi5 mpich"
 	    PACKAGE_LIST+=" mpitests-openmpi4 mpitests-openmpi5 mpitests-mpich"
-	    PACKAGE_LIST+=" mpitests-mvapich4-ucx mpitests-mvapich4-ofi"
+#	    PACKAGE_LIST+=" mpitests-mvapich4-ucx mpitests-mvapich4-ofi"
 	    ;;
 	2022*|2023*|2024*)
  	    PACKAGE_LIST+=" python3-targetcli-fb dapl-utils "
