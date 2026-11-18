@@ -48,6 +48,28 @@ set_ipoib_down()
     tp $host "ip link set dev $port down &&
 	   		  ip -4 addr flush $port"
 }
+
+# Wait until the IPoIB link to the remote address works: the remote IPv4
+# address answers a ping and no local IPv6 address is tentative.
+wait_ipoib_ready()
+{
+    local host=$1
+    local port=$2
+    local remote_addr=$3
+    local timeout=60
+    local i
+
+    for i in $(seq 1 $timeout); do
+	if tpq $host "ping -c 1 -W 1 $remote_addr" > /dev/null 2>&1 &&
+	       [ -z "$(tpq $host "ip -6 addr show dev $port tentative")" ]; then
+	    echo "IPoIB on $host ready after $i tries"
+	    return 0
+	fi
+	sleep 1
+    done
+    echo "IPoIB on $host not ready after $timeout tries"
+    return 1
+}
 disable_mlx5_enhanced()
 {
     local host=$1
@@ -92,6 +114,10 @@ driver_resetup()
 	juLog -name=h1_${testname}_start_opensm "start_opensm $host1 -p 10"
         # Give some time to OpenSM
         sleep 10
+    fi
+    if [ "$ip1" != "" -a "$ip2" != "" ]; then
+	juLog -name=h1_${testname}_ipoib_ready "wait_ipoib_ready $host1 $ipport1 $ip2"
+	juLog -name=h2_${testname}_ipoib_ready "wait_ipoib_ready $host2 $ipport2 $ip1"
     fi
 }
 test_ping()
